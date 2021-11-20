@@ -1,129 +1,212 @@
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "bugprone-reserved-identifier"
 #define _CRT_SECURE_NO_WARNINGS
-#include <stdio.h>
+#include <queue>
+
+#include <cstdio>
 #include <climits>
 #include <vector>
+#include <cmath>
+#include <algorithm>
 
 #define pii pair<int, int>
 #define vvp vector<vector<pii>> 
 #define vb vector<bool>
-#define vi vector<int>
 #define vii vector<pii>
 #define INF INT_MAX
 using namespace std;
 
-//template <class _Ty, class _Pr = less<typename vector<_Ty>::value_type>>
-//class Heap {
-//private:
-//	int _promote(int _hStop, int _cur_stop_idx, int h) {
-//		/*
-//		go down towart bigger child each step from _hStop to h.
-//		*/
+template <class _Ty, class _Compare = less<typename vector<_Ty>::value_type>>
+class Heap {
+    using _Container        = vector<_Ty>;
+    using const_reference   = typename _Container::const_reference;
+    using _Iter             = typename _Container::iterator;
+    using size_type         = typename _Container::size_type;
+    using value_type        = typename _Container::value_type;
+private:
+    int left_child_idx(int a) { return (a << 1) + 1; }
+    int right_child_idx(int a) { return (a << 1) + 2; }
+    _Iter left_child(int a) {return c.begin() + left_child_idx(a);}
+    _Iter left_child(_Iter a) {return left_child(distance(c.begin(), a));}
+    _Iter right_child(int a) {return c.begin() + right_child_idx(a);}
+    _Iter right_child(_Iter a) {return right_child(distance(c.begin(), a));}
+
+
+	int _promote(int _hStop, int vacant, int h) {
+		/*
+		go down towart bigger child each step from _hStop to h.
+        */
+        int _finalStop_idx; // ë‚´ë ¤ê°ˆ ìœ„ì¹˜
+        if (h <= _hStop) { // ë‚´ë ¤ê°ˆë§Œí¼ ë‚´ë ¤ê°”ì„ê²½ìš° í˜„ì¬ìœ„ì¹˜ë¥¼ ë¦¬í„´ì‹œí‚´
+            _finalStop_idx = vacant;
+        }
+        else if (comp(*right_child(vacant),*left_child(vacant)) && right_child_idx(vacant) < c.size()) { // ìš°ì¸¡ì´ ë” ì‘ì„ ê²½
+            iter_swap(c.begin() + vacant, right_child(vacant));
+            _finalStop_idx = _promote(_hStop, right_child_idx(vacant), h - 1);
+        }
+        else{ //ì¢Œì¸¡ ìì‹
+            iter_swap(c.begin() + vacant, left_child(vacant));
+            _finalStop_idx = _promote(_hStop, left_child_idx(vacant), h - 1);
+        }
+        return _finalStop_idx;
+
+//        while(_hStop < h--){
+//            auto _leftChild    = c.begin() + (distance(c.begin(), _cur_stop)  << 1) + 1;
+//            auto _biggerChild   = (comp(*_leftChild, *(_leftChild + 1)) ? _leftChild : _leftChild + 1);
+//            *_cur_stop = *_biggerChild;
+//            _cur_stop = _biggerChild;
+//        }
+//        return _cur_stop;
+
+	}
+
+	void _fixHeapFast(value_type K, int vacant,  int _h) {
+//        const_reference _Value = c.back(); c.pop_back();
 //
-//		int _final_stop_idx;
-//		if (h <= _hStop) 
-//			_final_stop_idx = _cur_stop_idx;
-//
-//		if (comp(c[_cur_stop_idx << 1 + 2], c[_cur_stop_idx << 1 + 1])) {
-//			c[_cur_stop_idx]	= c[_cur_stop_idx << 1 + 2];
-//			_final_stop_idx		= _promote(_hStop, _cur_stop_idx << 1 * 2, h - 1);
-//		}
-//		else {
-//			c[_cur_stop_idx]	= c[_cur_stop_idx << 1 + 1];
-//			_final_stop_idx		= _promote(_hStop, _cur_stop_idx << 1 * 1, h - 1);
-//		}
-//		return _final_stop_idx;
-//
-//	};
-//	void _fixHeapFast(const _Ty& _Value, int _hole_idx, int _h) {
-//		if (_h == 0) { // need to process for _h==1 ? 
-//			c[_hole_idx] = _Value;
-//			return;
-//		}
-//		else {
-//			int _h_half				= _h >> 1;
-//			int _next_hole_idx		= _promote(_h_half, _hole_idx, _h);  // go down from h to h/2
-//			int _next_hole_parent	= (hole_idx - 1) >> 1;
-//
-//			if (comp(_Value, c[stop_parent_idx])) {  /* violate min-heap */ 
-//				c[_next_hole_idx] = c[_next_hole_parent];
-//				_bubbleUpHeap(_Value, _next_hole_parent);
-//			}
-//			else 
-//				_fixHeapFast(_Value, _next_hole_idx, _h_half);
-//		}
-//		
-//	};
-//	void _bubbleUpHeap(const _Ty& _Value, int _hole_idx) {
-//		if (_hole_idx == 0) // root
-//			c[0] = Value;
-//		else {
-//			int _parent = (_hole_idx - 1) >> 1;
-//			if (comp(c[_hole_idx], _Value))
-//				c[_hole_idx] = _Value;
-//			else {
-//				c[_hole_idx] = c[_parent];
-//				_bubbleUpHeap(_Value, _parent);
-//			}
-//		}
-//	};
-//
-//public:
-//	explicit Heap(const _Pr& _Pred) : c(), comp(_Pred) {}
-//
-//	size_t size() const { return c.size(); }
-//	_Ty top() const {return c.front() }
-//	bool empty() const { return c.empty(); }
-//	void push(const _Ty& e) {};
-//	void pop() {};
-//protected:
-//	vector<_Ty> c{};
-//	_Pr comp{};
-//};
-//
-//struct comparePair {
-//	bool operator()(const pii& lhs, const pii& rhs) {
-//		return lhs.first < rhs.first;
-//	};
-//};
+//        _Iter _cur_hole = c.begin();
+//        _Iter _cur_hole_parent;
+//        int _h_half = _h;
+//        do {
+//            _h                  = _h_half;
+//            _h_half             = _h >> 1;
+//            _cur_hole           = _promote(_h_half, idx_of(_cur_hole), _h);
+//            if(!comp(*_cur_hole, _Value)){ /* violation */
+//                _bubbleUpHeap(_Value, c.begin() + ((idx_of(_cur_hole) - 1) >> 1));
+//                return;
+//            }
+//        } while (_h_half > 1);
+
+        if (_h == 0) return;
+        if (_h == 1) { // hê°€ 1ì´í•˜ì¼ê²½ìš°
+            if (left_child_idx(vacant) >= c.size())
+                return; // hê°€ 1ì´ë‚¨ì•˜ì§€ë§Œ í•´ë‹¹ë…¸ë“œì˜ ìì‹ì´ ì—†ì„ìˆ˜ë„ìˆë‹¤.
+            else if (comp(*right_child(vacant), K) && right_child_idx(vacant) < c.size()){
+//                *(c.begin() + vacant) = *right_child(vacant);
+//                *right_child(vacant) = K;
+                _Iter smaller = (comp(*left_child(vacant), *right_child(vacant)) ? left_child(vacant) : right_child(vacant));
+                iter_swap(c.begin() + vacant, smaller);
+            }
+            else if (comp(*left_child(vacant), K) && left_child_idx(vacant) < c.size()) {
+//                *(c.begin() + vacant) = *left_child(vacant);
+//                *left_child(vacant) = K;
+                iter_swap(c.begin() + vacant, left_child(vacant));
+            }
+            return;
+        }
+
+        int hStop = _h / 2;
+        int vacStop = _promote(hStop, vacant, _h); // ìƒˆë¡œìš´ ìœ„ì¹˜
+        int vacParent = (vacStop-1) >> 1; // ìƒˆë¡œ ì°¾ì€ ìœ„ì¹˜ì˜ ë¶€ëª¨
+        if (comp(K, *(c.begin() + vacParent))) {
+            iter_swap(c.begin() + vacStop, c.begin() + vacParent);
+            _bubbleUpHeap(vacant, K, vacParent);
+        }
+        else
+            _fixHeapFast(K, vacStop,  hStop);
+    }
+    void _fixHeap(value_type K, int h){
+
+    }
+    void _bubbleUpHeap(int root, value_type K, int vacant){
+        if (vacant == root)
+            *(c.begin() + vacant) = K;
+        else {
+            int parent = (vacant-1)>>1;
+            if (comp(*(c.begin() + parent), K)) { // ë¶€ëª¨ ë³´ë‹¤ í¬ë‹¤ë©´ ìê¸°ìœ„ì¹˜ë¥¼ ì°¾ì€ê²ƒ
+                *(c.begin() + vacant) = K;
+            }
+            else { // ë¶€ëª¨ ë³´ë‹¤ ì‘ë‹¤ë©´ ë²„ë¸”ì—…í™ì„ ê³„ì† ì‹¤í–‰
+                iter_swap(c.begin() + vacant, c.begin() + parent);
+                _bubbleUpHeap(root, K, parent);
+            }
+        }
+    }
+	void _bubbleUpHeap(value_type _Value, int vacant) {
+        /*
+         * repeat bubble up until there is not min-heap violation
+         */
+        if (c.empty()) return;
+
+        int _hole_idx = vacant;
+        for(
+                int _hole_parent_idx = (_hole_idx - 1) >> 1;
+                _hole_idx!=0 && comp(_Value, *(c.begin() + _hole_parent_idx));
+                _hole_parent_idx = (_hole_idx - 1) >> 1
+                ){
+            *(c.begin() + _hole_idx) = *(c.begin() + _hole_parent_idx);/* up hole and down value */
+            _hole_idx  = _hole_parent_idx;
+        }
+
+        *(c.begin() + _hole_idx) = _Value;
+    }
+
+public:
+	explicit Heap(const _Compare& _Pred) : c(), comp(_Pred) {}
+    Heap() = default;;
+    size_type size() const { return c.size(); }
+    bool empty() const { return c.empty(); }
+	const_reference top() const {
+        /* require none-empty! */
+        return c.front();
+    }
+	void push(const _Ty& e) {
+        c.push_back(e);
+        _bubbleUpHeap(e, c.size()-1);
+    }
+	void pop() {
+        if (c.empty()) return;
+        *(c.begin()) = c.back();
+        c.pop_back();
+        _fixHeapFast(c.front(), 0, static_cast<int>(log(c.size())+1));
+    }
+protected:
+	vector<_Ty> c{};
+    _Compare comp;
+};
+
+struct comparePair {
+	bool operator()(const pii& e1, const pii& e2) {
+		return (e1.second == e2.second ? e1.first < e2.first : e1.second < e2.second);
+	};
+};
+struct comparePair2 {
+    bool operator()(const pii& e1, const pii& e2) {
+        return (e1.second == e2.second ? e1.first > e2.first : e1.second > e2.second);
+    };
+};
 
 void prim(int start, const vvp& edge_list, vb& visited, int n) {
-	vi tree;
-	//Heap<pii> fringe(comparePair);
-	vii fringe
+	vii tree;
+	Heap<pii, comparePair> fringe;
+    //priority_queue<pii, vii, comparePair2> fringe;
 	int total_dist = 0;
 
 	visited[start] = true;
-	tree.push_back(start);
+	tree.push_back({start, 0});
 	int curV = start;
 
-	while (--n) { // n-1 ¹ø ¹İº¹
-		// ÀÎÁ¢ Á¤Á¡À» fringe Set ¿¡ ³Ö´Â´Ù.
+	while (--n) { // n-1 ë²ˆ ë°˜
+		//  ì¸ì ‘ ì •ì ì„ fringe Set ì— ì¶”
 		for (auto& adj : edge_list[curV]) 
-			if (!visited[adj.first]) fringe.push_back(adj);
+			if (!visited[adj.first]) fringe.push(adj);
 
-		int target = INF;
-		int cur_cost = INF;
-		// fringe Set Áß ÃÖ¼Ò°ªÀ» °®´Â Á¤Á¡À» ²¨³½´Ù.
-		for (auto& adj : fringe) {
-			if (!visited[adj.first]) {
-				if (adj.second < cur_cost) {
-					target = adj.first;
-					cur_cost = adj.second;
-				}
-				else if (adj.second == cur_cost)
-					target = (target < adj.first ? target : adj.first); // °°Àº cost ÀÌ¸é ³·Àº ¹øÈ£ ¿ì¼±
-			}
-		}
+        // min of fringe Set
+        int target, cur_cost;
+        do {
+            target = fringe.top().first;
+            cur_cost = fringe.top().second;
+            fringe.pop();
+        } while(visited[target]);
 
-		// ÇØ´ç Á¤Á¡À» Tree Set¿¡ ³Ö´Â´Ù.
+		//
 		visited[target] = true;
-		tree.push_back(target);
+		tree.push_back({target, cur_cost});
 		total_dist += cur_cost;
 		curV = target;
 	}
 	printf("%d ", total_dist);
-	for (auto& cur : tree) printf("%d ", cur);
-	printf("\n");
+	for (auto& cur : tree) printf("{%d, %d} ", cur.first, cur.second);
+	printf("remains(%d)\n", fringe.size());
 }
 
 int main() {
@@ -147,7 +230,7 @@ int main() {
 	}
 
 	while (q--) {
-		int startV = 0; 
+		int startV = 0;
 		if (scanf("\nP %d", &startV) != 1) {
 			printf("error scanf during get start vertex!\n");
 			return 1;
@@ -158,3 +241,18 @@ int main() {
 
 	return 0;
 }
+
+int _main() {
+    int n;
+    Heap<int> pq;
+    while(scanf("%d", &n)){
+        if(n>0) pq.push(n);
+        else{
+            printf("top: %d\n", pq.top());
+            pq.pop();
+        }
+
+    }
+}
+
+#pragma clang diagnostic pop
