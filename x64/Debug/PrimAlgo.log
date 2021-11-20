@@ -1,3 +1,0 @@
-﻿  main.cpp
-C:\Users\ydh95\source\repos\PrimAlgo\PrimAlgo\PrimAlgo\main.cpp(73,33): warning C4101: 'x' :참조되지 않은 지역 변수입니다.
-  PrimAlgo.vcxproj -> C:\Users\ydh95\source\repos\PrimAlgo\PrimAlgo\x64\Debug\PrimAlgo.exe
