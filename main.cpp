@@ -49,46 +49,18 @@ private:
             _finalStop_idx = _promote(_hStop, left_child_idx(vacant), h - 1);
         }
         return _finalStop_idx;
-
-//        while(_hStop < h--){
-//            auto _leftChild    = c.begin() + (distance(c.begin(), _cur_stop)  << 1) + 1;
-//            auto _biggerChild   = (comp(*_leftChild, *(_leftChild + 1)) ? _leftChild : _leftChild + 1);
-//            *_cur_stop = *_biggerChild;
-//            _cur_stop = _biggerChild;
-//        }
-//        return _cur_stop;
-
 	}
 
 	void _fixHeapFast(value_type K, int vacant,  int _h) {
-//        const_reference _Value = c.back(); c.pop_back();
-//
-//        _Iter _cur_hole = c.begin();
-//        _Iter _cur_hole_parent;
-//        int _h_half = _h;
-//        do {
-//            _h                  = _h_half;
-//            _h_half             = _h >> 1;
-//            _cur_hole           = _promote(_h_half, idx_of(_cur_hole), _h);
-//            if(!comp(*_cur_hole, _Value)){ /* violation */
-//                _bubbleUpHeap(_Value, c.begin() + ((idx_of(_cur_hole) - 1) >> 1));
-//                return;
-//            }
-//        } while (_h_half > 1);
-
         if (_h == 0) return;
         if (_h == 1) { // h가 1이하일경우
             if (left_child_idx(vacant) >= c.size())
                 return; // h가 1이남았지만 해당노드의 자식이 없을수도있다.
             else if (comp(*right_child(vacant), K) && right_child_idx(vacant) < c.size()){
-//                *(c.begin() + vacant) = *right_child(vacant);
-//                *right_child(vacant) = K;
                 _Iter smaller = (comp(*left_child(vacant), *right_child(vacant)) ? left_child(vacant) : right_child(vacant));
                 iter_swap(c.begin() + vacant, smaller);
             }
             else if (comp(*left_child(vacant), K) && left_child_idx(vacant) < c.size()) {
-//                *(c.begin() + vacant) = *left_child(vacant);
-//                *left_child(vacant) = K;
                 iter_swap(c.begin() + vacant, left_child(vacant));
             }
             return;
@@ -103,9 +75,6 @@ private:
         }
         else
             _fixHeapFast(K, vacStop,  hStop);
-    }
-    void _fixHeap(value_type K, int h){
-
     }
     void _bubbleUpHeap(int root, value_type K, int vacant){
         if (vacant == root)
@@ -206,7 +175,7 @@ void prim(int start, const vvp& edge_list, vb& visited, int n) {
 	}
 	printf("%d ", total_dist);
 	for (auto& cur : tree) printf("{%d, %d} ", cur.first, cur.second);
-	printf("remains(%d)\n", fringe.size());
+	printf("remains(%ld)\n", fringe.size());
 }
 
 int main() {
@@ -242,6 +211,7 @@ int main() {
 	return 0;
 }
 
+/* for local debugging */
 int _main() {
     int n;
     Heap<int> pq;
