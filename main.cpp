@@ -29,13 +29,17 @@ private:
 	void _bubbleUpHeap(value_type _Value, int vacant) {
         /*
          * repeat bubble up until there is not min-heap violation
+         * 
+         * - violation 이 발생하지 않을때까지 최대 O(logN)번 반복.
+         * - for 문 안에서 vacant를 위로 올리고 다음 인덱스를 갱신하는 작업이 O(1)
+         *     ==> 따라서 총 O(logN) 시간복잡도를 갖는다. 
          */
         if (c.empty()) return;
 
         int _hole_idx = vacant;
         for(
                 int _hole_parent_idx = (_hole_idx - 1) >> 1;
-                _hole_idx!=0 && comp(_Value, *(c.begin() + _hole_parent_idx));  /* Until Not violation */
+                _hole_idx!=0 && comp(_Value, *(c.begin() + _hole_parent_idx));  /* Until No violation */
                 _hole_parent_idx = (_hole_idx - 1) >> 1
                 ){
             *(c.begin() + _hole_idx) = *(c.begin() + _hole_parent_idx); /* up hole and down value */
@@ -46,7 +50,11 @@ private:
     }
     void _downHeap(_Iter root) {
         /*
-        * repeat downHeap until there is not min-heap violation
+        * repeat downHeap until there is no violation
+        * 
+        * - 두 자식 중 작은 자식과, 자신을 비교하는데 O(1)
+        * - 자식과 자신의 관계가 heap 조건을 만족하지 않으면 swap => 최대 O(logN) 반복
+        *     ==> 따라서 총 O(logN)의 시간복잡도를 갖는다.
         */
         _Iter smaller;
         if (left_child_idx(root) >= c.size()) return; /* leaf node! */
@@ -67,10 +75,22 @@ public:
         return c.front(); 
     }
 	void push(const _Ty& e) {
+        /*
+        *  push_back 연산      = O(1)
+        *  _bubbleUpHeap 연산  = O(logN)
+        * 
+        *  총 O(logN) 시간복잡도
+        */
         c.push_back(e);
         _bubbleUpHeap(e, c.size()-1);
     }
 	void pop() {
+        /*
+        * 맨 뒤의 요소를 루트에 위치시킴 = O(1)
+        * _downHeap 연산                 = O(logN)
+        * 
+        * 총 O(logN) 시간복잡도
+        */
         *(c.begin()) = c.back();
         c.pop_back();
         _downHeap(c.begin());
@@ -97,10 +117,14 @@ void prim(int start, const vvp& edge_list, vb& visited, int n) {
 
 	while (--n) { 
 		//  add adjacent vertex to fringe set
+        // 현재 정점에 연결된 모든 정점 탐색하므로 deg(v)
 		for (auto& adj : edge_list[curV]) 
 			if (!visited[adj.first]) fringe.push(adj);
 
-        // find minimal cost vertex in fringe set
+        // find minimal cost vertex in fringe set 
+        // top => O(1), pop => O(logN)
+        // 이미 방문했던 정점을 잇는 간선이 fringe set 에 최대 O(M) 만큼 있을 수 있지만, 총 간선의 개수가 M 이므로 prim 알고리즘을 다 수행했을 때 밑의 while문 실행 회수는 M번을 넘을 수 없다.
+        // 따라서 O(dev(v)logN)
         int target, cur_cost;
         do {
             target = fringe.top().first;
@@ -108,15 +132,21 @@ void prim(int start, const vvp& edge_list, vb& visited, int n) {
             fringe.pop();
         } while(visited[target]);
 
-		// set visited & move into tree
+		// set visited & move into tree => O(1)
 		visited[target] = true;
 		tree.push_back(target);
 		total_dist += cur_cost;
 		curV = target;
 	}
 	printf("%d ", total_dist);
-	for (auto& cur : tree) printf("%d ", cur);
+	for (auto& cur : tree) printf("%d ", cur);  // => O(N)
     printf("\n");
+
+    /*
+    * 따라서 N-1 번 while문을 반복할 때의 시간복잡도는 O(M + MlogN + N) == O(MlogN + N)
+    * 최종 프림알고리즘의 시간복잡도는 O(MlogN + N) 이다. 
+    * sparse 한 형태의 그래프에서는 O(N), dense 한 형태의 그래프에서는 O(MlogN) 근사할 수 있다.
+    */
 }
 
 int main() {
