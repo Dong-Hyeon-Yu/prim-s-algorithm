@@ -30,9 +30,9 @@ private:
         /*
          * repeat bubble up until there is not min-heap violation
          * 
-         * - violation ÀÌ ¹ß»ıÇÏÁö ¾ÊÀ»¶§±îÁö ÃÖ´ë O(logN)¹ø ¹İº¹.
-         * - for ¹® ¾È¿¡¼­ vacant¸¦ À§·Î ¿Ã¸®°í ´ÙÀ½ ÀÎµ¦½º¸¦ °»½ÅÇÏ´Â ÀÛ¾÷ÀÌ O(1)
-         *     ==> µû¶ó¼­ ÃÑ O(logN) ½Ã°£º¹Àâµµ¸¦ °®´Â´Ù. 
+         * - violation ì´ ë°œìƒí•˜ì§€ ì•Šì„ë•Œê¹Œì§€ ìµœëŒ€ O(logN)ë²ˆ ë°˜ë³µ.
+         * - for ë¬¸ ì•ˆì—ì„œ vacantë¥¼ ìœ„ë¡œ ì˜¬ë¦¬ê³  ë‹¤ìŒ ì¸ë±ìŠ¤ë¥¼ ê°±ì‹ í•˜ëŠ” ì‘ì—…ì´ O(1)
+         *     ==> ë”°ë¼ì„œ ì´ O(logN) ì‹œê°„ë³µì¡ë„ë¥¼ ê°–ëŠ”ë‹¤. 
          */
         if (c.empty()) return;
 
@@ -52,9 +52,9 @@ private:
         /*
         * repeat downHeap until there is no violation
         * 
-        * - µÎ ÀÚ½Ä Áß ÀÛÀº ÀÚ½Ä°ú, ÀÚ½ÅÀ» ºñ±³ÇÏ´Âµ¥ O(1)
-        * - ÀÚ½Ä°ú ÀÚ½ÅÀÇ °ü°è°¡ heap Á¶°ÇÀ» ¸¸Á·ÇÏÁö ¾ÊÀ¸¸é swap => ÃÖ´ë O(logN) ¹İº¹
-        *     ==> µû¶ó¼­ ÃÑ O(logN)ÀÇ ½Ã°£º¹Àâµµ¸¦ °®´Â´Ù.
+        * - ë‘ ìì‹ ì¤‘ ì‘ì€ ìì‹ê³¼, ìì‹ ì„ ë¹„êµí•˜ëŠ”ë° O(1)
+        * - ìì‹ê³¼ ìì‹ ì˜ ê´€ê³„ê°€ heap ì¡°ê±´ì„ ë§Œì¡±í•˜ì§€ ì•Šìœ¼ë©´ swap => ìµœëŒ€ O(logN) ë°˜ë³µ
+        *     ==> ë”°ë¼ì„œ ì´ O(logN)ì˜ ì‹œê°„ë³µì¡ë„ë¥¼ ê°–ëŠ”ë‹¤.
         */
         _Iter smaller;
         if (left_child_idx(root) >= c.size()) return; /* leaf node! */
@@ -76,20 +76,20 @@ public:
     }
 	void push(const _Ty& e) {
         /*
-        *  push_back ¿¬»ê      = O(1)
-        *  _bubbleUpHeap ¿¬»ê  = O(logN)
+        *  push_back ì—°ì‚°      = O(1)
+        *  _bubbleUpHeap ì—°ì‚°  = O(logN)
         * 
-        *  ÃÑ O(logN) ½Ã°£º¹Àâµµ
+        *  ì´ O(logN) ì‹œê°„ë³µì¡ë„
         */
         c.push_back(e);
         _bubbleUpHeap(e, c.size()-1);
     }
 	void pop() {
         /*
-        * ¸Ç µÚÀÇ ¿ä¼Ò¸¦ ·çÆ®¿¡ À§Ä¡½ÃÅ´ = O(1)
-        * _downHeap ¿¬»ê                 = O(logN)
+        * ë§¨ ë’¤ì˜ ìš”ì†Œë¥¼ ë£¨íŠ¸ì— ìœ„ì¹˜ì‹œí‚´ = O(1)
+        * _downHeap ì—°ì‚°                 = O(logN)
         * 
-        * ÃÑ O(logN) ½Ã°£º¹Àâµµ
+        * ì´ O(logN) ì‹œê°„ë³µì¡ë„
         */
         *(c.begin()) = c.back();
         c.pop_back();
@@ -117,14 +117,14 @@ void prim(int start, const vvp& edge_list, vb& visited, int n) {
 
 	while (--n) { 
 		//  add adjacent vertex to fringe set
-        // ÇöÀç Á¤Á¡¿¡ ¿¬°áµÈ ¸ğµç Á¤Á¡ Å½»öÇÏ¹Ç·Î deg(v)
+        // í˜„ì¬ ì •ì ì— ì—°ê²°ëœ ëª¨ë“  ì •ì  íƒìƒ‰í•˜ë¯€ë¡œ deg(v)
 		for (auto& adj : edge_list[curV]) 
-			if (!visited[adj.first]) fringe.push(adj);
+			if (!visited[adj.first]) fringe.push(adj); // log(N)
 
         // find minimal cost vertex in fringe set 
         // top => O(1), pop => O(logN)
-        // ÀÌ¹Ì ¹æ¹®Çß´ø Á¤Á¡À» ÀÕ´Â °£¼±ÀÌ fringe set ¿¡ ÃÖ´ë O(M) ¸¸Å­ ÀÖÀ» ¼ö ÀÖÁö¸¸, ÃÑ °£¼±ÀÇ °³¼ö°¡ M ÀÌ¹Ç·Î prim ¾Ë°í¸®ÁòÀ» ´Ù ¼öÇàÇßÀ» ¶§ ¹ØÀÇ while¹® ½ÇÇà È¸¼ö´Â M¹øÀ» ³ÑÀ» ¼ö ¾ø´Ù.
-        // µû¶ó¼­ O(dev(v)logN)
+        // ì´ë¯¸ ë°©ë¬¸í–ˆë˜ ì •ì ì„ ì‡ëŠ” ê°„ì„ ì´ fringe set ì— ìµœëŒ€ O(M) ë§Œí¼ ìˆì„ ìˆ˜ ìˆì§€ë§Œ, ì´ ê°„ì„ ì˜ ê°œìˆ˜ê°€ M ì´ë¯€ë¡œ prim ì•Œê³ ë¦¬ì¦˜ì„ ë‹¤ ìˆ˜í–‰í–ˆì„ ë•Œ ë°‘ì˜ whileë¬¸ ì‹¤í–‰ íšŒìˆ˜ëŠ” Më²ˆì„ ë„˜ì„ ìˆ˜ ì—†ë‹¤.
+        // ë”°ë¼ì„œ O(AverageDeg(v)logN) => O(logN) ìœ¼ë¡œ ê·¼ì‚¬
         int target, cur_cost;
         do {
             target = fringe.top().first;
@@ -143,9 +143,9 @@ void prim(int start, const vvp& edge_list, vb& visited, int n) {
     printf("\n");
 
     /*
-    * µû¶ó¼­ N-1 ¹ø while¹®À» ¹İº¹ÇÒ ¶§ÀÇ ½Ã°£º¹Àâµµ´Â O(M + MlogN + N) == O(MlogN + N)
-    * ÃÖÁ¾ ÇÁ¸²¾Ë°í¸®ÁòÀÇ ½Ã°£º¹Àâµµ´Â O(MlogN + N) ÀÌ´Ù. 
-    * sparse ÇÑ ÇüÅÂÀÇ ±×·¡ÇÁ¿¡¼­´Â O(N), dense ÇÑ ÇüÅÂÀÇ ±×·¡ÇÁ¿¡¼­´Â O(MlogN) ±Ù»çÇÒ ¼ö ÀÖ´Ù.
+    * ë”°ë¼ì„œ N-1 ë²ˆ whileë¬¸ì„ ë°˜ë³µí•  ë•Œì˜ ì‹œê°„ë³µì¡ë„ëŠ” O(MlogN + NlogN + N) == O(MlogN + NlogN)
+    * ìµœì¢… í”„ë¦¼ì•Œê³ ë¦¬ì¦˜ì˜ ì‹œê°„ë³µì¡ë„ëŠ” O(MlogN + NlogN) ì´ë‹¤. 
+    * sparse í•œ í˜•íƒœì˜ ê·¸ë˜í”„ì—ì„œëŠ” O(NlogN), dense í•œ í˜•íƒœì˜ ê·¸ë˜í”„ì—ì„œëŠ” O(MlogN) ê·¼ì‚¬í•  ìˆ˜ ìˆë‹¤.
     */
 }
 
